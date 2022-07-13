@@ -1,23 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
 
 function App() {
+  const buttonTextItems = [
+    'Bears, beets, battlestar galactica',
+    `What's Forrest Gump's password? 1Forrest1`,
+    'Where do programmers like to hang out? The Foo Bar'
+  ];
+  const initialGameState = {
+    victory: false,
+    startTime: null,
+    endTime: null,
+  }
+
+  const [snippet, setSnippet] = useState('');
+  // const hook = useState('');
+  // const snippet = hook[0];
+  // const setSnippet = hook[1];
+  const [userText, setUserText] = useState('');
+  const [gameState, setGameState] = useState(initialGameState);
+
+  function updateUserText(event) {
+    const newUserText = event.target.value;
+    setUserText(newUserText);
+    if (newUserText === snippet) {
+      setGameState({
+        ...gameState,
+        victory: true,
+        endTime: new Date().getTime() - gameState.startTime,
+      })
+    }
+  }
+
+  function chooseSnippet(index) {
+    setSnippet(buttonTextItems[index]);
+    setGameState({
+      ...initialGameState,
+      startTime: new Date().getTime(),
+    })
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h2>TypeRace</h2>
+      <hr />
+      <h3>Snippet</h3>
+      <div>{snippet}</div>
+      <h4>{gameState.victory ? `Done! Woot! Time: ${gameState.endTime}ms` : null}</h4>
+      <input value={userText} onChange={updateUserText} />
+      <hr />
+      {buttonTextItems.map((snippetText, index) =>
+        <button key={index} onClick={() => chooseSnippet(index)}>{snippetText}</button>)}
     </div>
   );
 }
