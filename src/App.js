@@ -13,9 +13,6 @@ function App() {
   }
 
   const [snippet, setSnippet] = useState('');
-  // const hook = useState('');
-  // const snippet = hook[0];
-  // const setSnippet = hook[1];
   const [userText, setUserText] = useState('');
   const [gameState, setGameState] = useState(initialGameState);
 
