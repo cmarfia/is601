@@ -1,11 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import SnippetSelector from './SnippetSelector';
 
 function App() {
-  const buttonTextItems = [
-    'Bears, beets, battlestar galactica',
-    `What's Forrest Gump's password? 1Forrest1`,
-    'Where do programmers like to hang out? The Foo Bar'
-  ];
   const initialGameState = {
     victory: false,
     startTime: null,
@@ -13,11 +9,30 @@ function App() {
   }
 
   const [snippet, setSnippet] = useState('');
-  // const hook = useState('');
-  // const snippet = hook[0];
-  // const setSnippet = hook[1];
   const [userText, setUserText] = useState('');
   const [gameState, setGameState] = useState(initialGameState);
+  const [hasError, setErrors] = useState(false);
+  const [films, setFilms] = useState([]);
+
+  useEffect(function () {
+    if (gameState.victory) {
+      document.title = "Victory";
+    }
+  }, [gameState])
+
+  useEffect(function () {
+    async function fetchData() {
+      try {
+        const response = await fetch('https://ghibliapi.herokuapp.com/films?limit=3');
+        const films = await response.json();
+        setFilms(films);
+      }
+      catch (error) {
+        setErrors(error)
+      }
+    }
+    fetchData();
+  }, [])
 
   function updateUserText(event) {
     const newUserText = event.target.value;
@@ -31,8 +46,8 @@ function App() {
     }
   }
 
-  function chooseSnippet(index) {
-    setSnippet(buttonTextItems[index]);
+  function chooseSnippet(selectedSnippet) {
+    setSnippet(selectedSnippet);
     setGameState({
       ...initialGameState,
       startTime: new Date().getTime(),
@@ -48,8 +63,8 @@ function App() {
       <h4>{gameState.victory ? `Done! Woot! Time: ${gameState.endTime}ms` : null}</h4>
       <input value={userText} onChange={updateUserText} />
       <hr />
-      {buttonTextItems.map((snippetText, index) =>
-        <button key={index} onClick={() => chooseSnippet(index)}>{snippetText}</button>)}
+      <SnippetSelector films={films} chooseSnippet={chooseSnippet} />
+      <>{hasError ? 'An error has occurred' : null}</>
     </div>
   );
 }
